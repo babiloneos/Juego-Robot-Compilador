@@ -1,0 +1,4 @@
+mover arriba 3;
+mover 4 derecha;
+si hay manzana entonces comer;
+repite 5 veces mover 1 arriba;

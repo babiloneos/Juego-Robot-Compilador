@@ -1,0 +1,93 @@
+package Sintactico;
+import java_cup.runtime.Symbol;
+import java.util.LinkedList;
+import Config.TError;
+import java.util.ArrayList;
+
+parser code
+{:
+
+    public static LinkedList<TError> TablaES = new LinkedList<TError>(); 
+    
+    public void syntax_error(Symbol s)
+    {        
+        String lexema = s.toString();
+        int fila = s.right;
+        int columna = s.left;
+        Object obj = s.value;
+        
+        System.out.println("!Error Sintactico Recuperado!");
+        System.out.println("\t\tLexema: "+lexema);
+        System.out.println("\t\tFila: "+fila);
+        System.out.println("\t\tColumna: "+columna);
+        System.out.println("\t\tObjeto: " + obj);
+
+        TError datos = new TError(lexema,fila,columna,"Error Sintactico","Caracter no esperado");
+        TablaES.add(datos);
+       
+    }
+
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception
+    {        
+        String lexema = s.toString();
+        int fila = s.right;
+        int columna = s.left;
+        
+        System.out.println("!Error Sintactico no2!");
+        System.out.println("\t\tLexema: "+lexema);
+        System.out.println("\t\tFila: "+fila);
+        System.out.println("\t\tColumna: "+columna);
+
+        TError datos = new TError(lexema,fila,columna,"Error Sintactico","Caracter no esperado");
+        TablaES.add(datos);
+     
+    }
+
+:}
+
+action code
+{:
+
+    public ArrayList <String> inter = new ArrayList <String>();
+
+    public ArrayList <String> getInter(){
+        return inter;
+    }
+    
+:}
+
+terminal Inicio, Fin, PyC, Mover, Comer, If, Entonces, Repite, Veces, Hay, No_Hay;
+terminal Limite, Manzana, Izq, Der, Arr, Aba;
+
+terminal Integer Num;
+
+non terminal String PROG, ACC, CON;
+
+precedence left Izq, Der, Arr, Aba;
+precedence left If;
+precedence left Repite;
+precedence right PyC;
+
+PROG    ::= PROG ACC:e PyC {: inter.add( e + " PyC"); :}
+        | ACC:e PyC {: inter.add( e + " PyC"); :}
+        | error
+        ;
+
+ACC     ::= Inicio  {: RESULT = "START"; :}
+        |   Fin {: RESULT = "FINISH"; :}
+        |   Mover Num:a Izq {: RESULT = "MOVE LEFT " + a; :}
+        |   Mover Num:a Der {: RESULT = "MOVE RIGHT " + a; :}
+        |   Mover Num:a Arr {: RESULT = "MOVE UP " + a; :}
+        |   Mover Num:a Aba {: RESULT = "MOVE DOWN " + a; :}
+        |   Comer   {: RESULT = "EAT"; :}
+        |   If CON:a Entonces ACC:b {: RESULT = "IF " + a + " THEN " + b; :}
+        |   Repite Num:a Veces ACC:b {: RESULT = "FOR " + a + " TIMES " + b; :}
+        ;
+
+CON     ::=  Limite Izq  {: RESULT = "LEFT LIMIT"; :}
+        |   Limite Der  {: RESULT = "RIGHT LIMIT"; :}
+        |   Limite Arr  {: RESULT = "UPPER LIMIT"; :}
+        |   Limite Aba  {: RESULT = "LOWER LIMIT"; :}
+        |   Hay Manzana {: RESULT = "IS APPLE"; :}
+        |   No_Hay Manzana  {: RESULT = "NOT APPLE"; :}
+        ;
